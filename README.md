@@ -71,3 +71,7 @@ ruff check src/ tests/
 ruff format src/ tests/
 pytest
 ```
+
+## License
+
+MIT
