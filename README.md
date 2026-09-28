@@ -2,6 +2,10 @@
 
 MCP server for Slack integration, built with FastMCP. Provides tools for listing channels, reading messages, and posting to Slack.
 
+Channel listing and reading are observational. `slack_post_message` performs an
+external write immediately when invoked, so callers should confirm the resolved
+destination and message content before calling it.
+
 ## Install
 
 ```bash
@@ -13,7 +17,7 @@ pip install -e ".[dev]"
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `SLACK_BOT_TOKEN` | Yes | Bot User OAuth Token (`xoxb-...`) |
-| `SLACK_DEFAULT_CHANNEL` | No | Fallback channel for `slack_post_message` |
+| `SLACK_DEFAULT_CHANNEL` | No | Current fallback channel when `slack_post_message` receives an empty channel |
 
 Copy `.env.example` to `.env` and fill in your values.
 
@@ -25,7 +29,9 @@ Copy `.env.example` to `.env` and fill in your values.
 | `slack_read_channel(channel, limit?)` | Read last N messages from a channel (default: 20, max: 100) |
 | `slack_post_message(channel, text)` | Send a message to a channel |
 
-The `channel` parameter accepts either a channel name (without `#`) or a Slack channel ID.
+The `channel` parameter accepts a channel name (without `#`) or a public-channel
+ID beginning with `C`. Correct handling for other Slack conversation ID types is
+tracked in [Issue #8](https://github.com/antonio-mello-ai/mcp-slack/issues/8).
 
 ## Slack App Setup
 
@@ -38,7 +44,10 @@ The `channel` parameter accepts either a channel name (without `#`) or a Slack c
    | `slack_read_channel` | `channels:history`, `groups:history` |
    | `slack_post_message` | `chat:write` |
    
-   *Note: Private-channel access (`groups:*`) and DM scopes are only needed if the bot operates outside public channels.*
+   *Note: Private-channel access requires the corresponding `groups:*` scopes
+   and bot membership. Direct-message and multi-party conversation support is
+   not currently implemented; the supported conversation contract is tracked
+   in [Issue #8](https://github.com/antonio-mello-ai/mcp-slack/issues/8).*
 
 3. Install the app to your workspace
 4. Copy the **Bot User OAuth Token** (`xoxb-...`) to `SLACK_BOT_TOKEN`
@@ -82,3 +91,14 @@ pytest
 ## License
 
 MIT
+
+## Documentation and roadmap
+
+- [Current product flows](docs/fluxos-negocio.md)
+- [Architecture](docs/arquitetura.md)
+- [Operations](docs/operacao.md)
+- [Documentation index](docs/index.md)
+- [Open roadmap items](https://github.com/antonio-mello-ai/mcp-slack/issues)
+
+Priorities live in GitHub Issues and Projects. Delivery history lives in closed
+Issues, pull requests and GitHub Releases.
